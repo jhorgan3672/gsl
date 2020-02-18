@@ -1,4 +1,4 @@
-const mymap = L.map('mapid', {zoomControl:true, maxZoom:20, minZoom:3}).setView([32.302172, -90.873545], 16);
+const mymap = L.map('mapid', {zoomControl:true, maxZoom:20, minZoom:3}).setView([32.302172, -90.873545], 10);
 
 const basemap = new L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 		maxZoom: 18,
@@ -8,6 +8,8 @@ const basemap = new L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y
 		id: 'mapbox.streets'
 	}).addTo(mymap);
 	
+
+let myRenderer = L.canvas({ padding: 0.5 });
 
 //Function to assign colors to points based on a specified value (v). 
 const getColor = (v) => {
@@ -24,7 +26,7 @@ const getColor = (v) => {
 
 //Function to display multiple points in the same file and visualize according to specified values.  
 const renderMultiPoints = (feature) => {
-	for(let i=0; i<92; i++)
+	for(let i=0; i<feature.features.length; i++)
 	L.geoJSON(feature, { 
 		style: function(feature) {
 			return {
@@ -32,7 +34,6 @@ const renderMultiPoints = (feature) => {
 				fillColor: getColor(feature.properties.az),
 				radius: 5,
         		opacity: 1,
-        		color: 'Black',
         		dashArray: '',
         		lineCap: 'butt',
         		lineJoin: 'miter',
@@ -42,9 +43,28 @@ const renderMultiPoints = (feature) => {
 			}
 		},
 	pointToLayer: function (feature, latlng){ 
-		return L.circleMarker(latlng)}}).addTo(mymap)
+		return L.circleMarker(latlng, {renderer: myRenderer})}}).addTo(mymap);
+};
+
+//Gets the lat,long of the json files points, creates an array from those values, and draws it on the map. 
+function connectTheDots(v) {
+    let sub_array = [];
+	let super_array = [];
+ 
+    for (let i = 0; i < v.features.length; i++) {
+		let a = v.features[i].properties.Lat;
+		let b = v.features[i].properties.Lng;
+		let c = v.features[i].properties.az;
+		let x = new Array(a,b,c);
+		sub_array.push(x);
+};
+super_array.push(sub_array.concat());
+
+L.polyline(super_array, {color: 'Green'}).addTo(mymap);
 
 };
 
-//Applying the function to a specific json file
-renderMultiPoints(gsl_json)
+connectTheDots(gsl1);
+
+
+

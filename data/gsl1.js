@@ -1,4 +1,4 @@
-var gsl_json = {
+var gsl1 = {
     "type": "FeatureCollection",
     "name": "gslGeoJSONTest1",
     "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
