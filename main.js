@@ -25,7 +25,7 @@ const getColor = (v) => {
 };
 
 //Function to display multiple points in the same file and visualize according to specified values.  
-const renderMultiPoints = (feature) => {
+const getTheDots = (feature) => {
 	for(let i=0; i<feature.features.length; i++)
 	L.geoJSON(feature, { 
 		style: function(feature) {
@@ -48,23 +48,62 @@ const renderMultiPoints = (feature) => {
 
 //Gets the lat,long of the json files points, creates an array from those values, and draws it on the map. 
 function connectTheDots(v) {
-    let sub_array = [];
-	let super_array = [];
- 
+	let sub_array = [];
     for (let i = 0; i < v.features.length; i++) {
+
 		let a = v.features[i].properties.Lat;
 		let b = v.features[i].properties.Lng;
-		let c = v.features[i].properties.az;
-		let x = new Array(a,b,c);
+		let x = new Array(a,b);
 		sub_array.push(x);
-};
-super_array.push(sub_array.concat());
+		}; 
 
-L.polyline(super_array, {color: 'Green'}).addTo(mymap);
+		sub_array2 = sub_array;
+		sub_array3 = [];
 
-};
+		for(let j=0; j<v.features.length; j+=2){
+		let c = sub_array2[j];
+		let d = sub_array2[j+1];
+		sub_array3.push([c,d]);
+		};
+
+		let sub_array4 = sub_array3;
+		let geojson = {
+			"name":"NewFeatureType",
+			"type":"FeatureCollection",
+			"features":[{
+				"type":"Feature",
+				"properties": {
+					"stroke": "#1c8e6c",
+					"stroke-width": 2,
+					"stroke-opacity": 1
+				  },
+				"geometry":{
+					"type":"LineString",
+					"coordinates":[]
+				},
+				"properties":null
+			}]
+		};
+
+		for(let t=0; t<5; t++){
+			let a = {"type": "LineString",
+					 "coordinates": sub_array4[t]};
+			let c = new Object(a);
+			geojson.features[0].geometry.coordinates.push(c);
+			
+		};
+
+		console.log(geojson); 
+		};
+		
+	
+
+
+
+
+
+
+//getTheDots(gsl1);
 
 connectTheDots(gsl1);
-
-
 
