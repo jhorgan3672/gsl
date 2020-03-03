@@ -25,7 +25,7 @@ const getColor = (v) => {
 };
 
 //Function to display multiple points in the same file and visualize according to specified values.  
-const getTheDots = (feature) => {
+const plotTheDots = (feature) => {
 	for(let i=0; i<feature.features.length; i++)
 	L.geoJSON(feature, { 
 		style: function(feature) {
@@ -45,16 +45,18 @@ const getTheDots = (feature) => {
 	pointToLayer: function (feature, latlng){ 
 		return L.circleMarker(latlng, {renderer: myRenderer})}}).addTo(mymap);
 };
-
-//Gets the lat,long of the json files points, creates an array from those values, and draws it on the map. 
+ 
 function connectTheDots(v) {
 	let sub_array = [];
+
     for (let i = 0; i < v.features.length; i++) {
 
 		let a = v.features[i].properties.Lat;
 		let b = v.features[i].properties.Lng;
-		let x = new Array(a,b);
+		c = v.features[i].properties.az; 
+		let x = new Array(b,a,c);
 		sub_array.push(x);
+
 		}; 
 
 		sub_array2 = sub_array;
@@ -67,6 +69,7 @@ function connectTheDots(v) {
 		};
 
 		let sub_array4 = sub_array3;
+
 		let geojson = {
 			"name":"NewFeatureType",
 			"type":"FeatureCollection",
@@ -79,31 +82,49 @@ function connectTheDots(v) {
 				  },
 				"geometry":{
 					"type":"LineString",
-					"coordinates":[]
+					"coordinates": []
 				},
 				"properties":null
 			}]
 		};
 
-		for(let t=0; t<5; t++){
+		
+		let geojson2 = [];
+
+		for(let t=0; t<46; t++){
 			let a = {"type": "LineString",
-					 "coordinates": sub_array4[t]};
+					 "coordinates": sub_array4[t],
+					 "color": getColor(sub_array4[t][0][2])};
 			let c = new Object(a);
-			geojson.features[0].geometry.coordinates.push(c);
-			
+			//geojson.features[0].geometry.coordinates.push(c);
+			geojson2.push(c); 
 		};
 
-		console.log(geojson); 
+		function getMoreColor(feature){
+			for(i=0;i<46;i++){
+				return feature[i].color	 
+				}; 
 		};
 		
-	
+		var myStyle = {
+			stroke: getMoreColor(geojson2),
+			weight: 10
+		}
+
+	for(let i=0; i<geojson2.length; i++){
+	L.geoJSON(geojson2, { 
+		style: function(feature) {
+			return {
+				color: getMoreColor(geojson2),
+				weight: 1
+			}
+		}
+	}).addTo(mymap)};
+
+};
 
 
-
-
-
-
-//getTheDots(gsl1);
+plotTheDots(gsl1);
 
 connectTheDots(gsl1);
 
