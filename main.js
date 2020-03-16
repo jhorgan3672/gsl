@@ -46,7 +46,7 @@ const plotTheDots = (feature) => {
 		return L.circleMarker(latlng, {renderer: myRenderer})}}).addTo(mymap);
 };
  
-function connectTheDots(v) {
+function layTheLines(v) {
 	let sub_array = [];
 
     for (let i = 0; i < v.features.length; i++) {
@@ -126,5 +126,5 @@ function connectTheDots(v) {
 
 plotTheDots(gsl1);
 
-connectTheDots(gsl1);
+layTheLines(gsl1);
 
