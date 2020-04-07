@@ -1,30 +1,41 @@
-const mymap = L.map('mapid', {zoomControl:true, maxZoom:20, minZoom:3}).setView([32.302172, -90.873545], 10);
+const mymap = L.map('mapid', {zoomControl:true, maxZoom:20, minZoom:3}).setView([32.302172, -90.873545], 15);
 
 const basemap = new L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 		maxZoom: 18,
 		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
 			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-		id: 'mapbox.streets'
+		id: 'mapbox.dark'
 	}).addTo(mymap);
 	
 
 let myRenderer = L.canvas({ padding: 0.5 });
 
-//Function to assign colors to points based on a specified value (v). 
+
 const getColor = (v) => {
 	if(v < 0.0175){
-		return 'Green'
+		return "Green"
 	} else if(v > 0.0175 && v < 0.02) {
-		return 'Yellow'
+		return "Yellow"
 	} else if(v > 0.02){
-		return 'Red'
+		return "Red"
 	} else {
-		return 'Teal'
+		return "Orange"
 	}
 };
 
-//Function to display multiple points in the same file and visualize according to specified values.  
+const getMoreColor = (v) => {
+	if(v == "Green"){
+		return 'Green'
+	} else if(v == "Yellow") {
+		return 'Yellow'
+	} else if(v == "Red"){
+		return 'Red'
+	} else {
+		return 'Orange'
+	}
+};
+
 const plotTheDots = (feature) => {
 	for(let i=0; i<feature.features.length; i++)
 	L.geoJSON(feature, { 
@@ -46,7 +57,44 @@ const plotTheDots = (feature) => {
 		return L.circleMarker(latlng, {renderer: myRenderer})}}).addTo(mymap);
 };
  
+//function for extracting Long/Lat and mapping lines
+
 function layTheLines(v) {
+        sub_array1 = [];
+
+		for(let j=0; j<v.features.length; j+=2){
+			let c = v.features[j].geometry.coordinates;
+			let d = v.features[j+1].geometry.coordinates;
+        	sub_array1.push([c,d]);
+       
+		};
+        
+		for(let t=0; t<sub_array1.length; t++){
+			let e = {"type": "LineString",
+					 "coordinates": sub_array1[t],
+                     "color": getColor(v.features[t].properties.az),
+                    
+                    }
+			let f = new Object(e);
+
+			var myStyle1 = {
+				color: e.color,
+				weight: 10
+	
+			}; 
+	
+			var myStyle2 = {
+				color: 'Black',
+				weight: 15
+			}
+	
+			L.geoJSON(f, {style: myStyle2}).addTo(mymap);
+            L.geoJSON(f, {style: myStyle1}).addTo(mymap); 
+              
+		};
+	};
+
+/*function layTheLines(v) {
 	let sub_array = [];
 
     for (let i = 0; i < v.features.length; i++) {
@@ -68,28 +116,7 @@ function layTheLines(v) {
 		sub_array3.push([c,d]);
 		};
 
-		let sub_array4 = sub_array3;
-
-		let geojson = {
-			"name":"NewFeatureType",
-			"type":"FeatureCollection",
-			"features":[{
-				"type":"Feature",
-				"properties": {
-					"stroke": "#1c8e6c",
-					"stroke-width": 2,
-					"stroke-opacity": 1
-				  },
-				"geometry":{
-					"type":"LineString",
-					"coordinates": []
-				},
-				"properties":null
-			}]
-		};
-
-		
-		let geojson2 = [];
+		let sub_array4 = sub_array3; 
 
 		for(let t=0; t<46; t++){
 			let a = {"type": "LineString",
@@ -97,34 +124,25 @@ function layTheLines(v) {
 					 "color": getColor(sub_array4[t][0][2])};
 			let c = new Object(a);
 			//geojson.features[0].geometry.coordinates.push(c);
-			geojson2.push(c); 
-		};
-
-		function getMoreColor(feature){
-			for(i=0;i<46;i++){
-				return feature[i].color	 
-				}; 
-		};
-		
-		var myStyle = {
-			stroke: getMoreColor(geojson2),
-			weight: 10
-		}
-
-	for(let i=0; i<geojson2.length; i++){
-	L.geoJSON(geojson2, { 
-		style: function(feature) {
-			return {
-				color: getMoreColor(geojson2),
-				weight: 1
+			var myStyle1 = {
+				color: getMoreColor(c.color),
+				weight: 5
+	
+			}; 
+	
+			var myStyle2 = {
+				color: 'Black',
+				weight: 10
 			}
-		}
-	}).addTo(mymap)};
+	
+			L.geoJSON(c, {style: myStyle2}).addTo(mymap);
+			L.geoJSON(c, {style: myStyle1}).addTo(mymap); 
+		};
+
+		
 
 };
-
-
-plotTheDots(gsl1);
-
+*/
+layTheLines(gsl2)
 layTheLines(gsl1);
 
